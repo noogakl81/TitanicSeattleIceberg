@@ -20,6 +20,7 @@ def create_knn_regressor_age(X,Y,parameters):
 
     V = np.cov(np.transpose(X))
     knn = KNeighborsRegressor(metric='mahalanobis', metric_params={'V':V})
+#    knn = KNeighborsRegressor(metric='minkowski')
     sss = ShuffleSplit(n_splits=40, test_size = 0.2, random_state=472)
 
     grid_search_CV = GridSearchCV(knn, parameters, cv=sss)

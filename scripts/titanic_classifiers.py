@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedShuffleSplit
 
@@ -107,14 +108,14 @@ def create_knn_classifier(X,Y,parameters):
 
     accuracy_scorer = make_scorer(accuracy_score)
 
-    from sklearn.cross_validation import KFold
     from numpy.random import RandomState
-    
-    parameters = {'n_neighbors':[5,7,9,11,13],'weights':['distance','uniform']}
-
+   
+    parameters = {'n_neighbors':[5,7,9,11,13],'weights':['uniform']}
+ 
     V = np.cov(np.transpose(X))
 
     knn = KNeighborsClassifier(metric='mahalanobis', metric_params={'V':V})
+#    knn = KNeighborsClassifier(metric='minkowski',p=2)
 
     sss = StratifiedShuffleSplit(n_splits=20, test_size = 0.5, random_state=4782)
     grid_search_CV = GridSearchCV(knn, parameters, cv=sss, scoring=accuracy_scorer)
@@ -126,3 +127,4 @@ def create_knn_classifier(X,Y,parameters):
     knn_score = knn.score(X, Y)    
     print(knn_score)
     return knn
+
