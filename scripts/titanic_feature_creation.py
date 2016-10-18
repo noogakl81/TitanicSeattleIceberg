@@ -24,7 +24,7 @@ def create_title_classes(df):
 
 def one_hot_encode_embarked_variables(df):
     embark_dummies  = pd.get_dummies(df['Embarked'])
-    embark_dummies.drop(['S'], axis=1, inplace=True)
+#    embark_dummies.drop(['S'], axis=1, inplace=True)
     df.drop(['Embarked'], axis=1,inplace=True)
     return df.join(embark_dummies)
 
@@ -38,7 +38,7 @@ def one_hot_encode_gender_variables(df):
 def one_hot_encode_class_variables(df):
     pclass_dummies  = pd.get_dummies(df['Pclass'])
     pclass_dummies.columns = ['Class_1','Class_2','Class_3']
-    pclass_dummies.drop(['Class_3'], axis=1, inplace=True)
+#    pclass_dummies.drop(['Class_3'], axis=1, inplace=True)
     df.drop(['Pclass'],axis=1,inplace=True)
     df = df.join(pclass_dummies)
     return df
@@ -51,5 +51,5 @@ def define_young_old_miss_features(df):
 
 def make_family_size_feature(df):
     df['Family_Size'] = 1 + df['Parch'] + df['SibSp']
-    df.drop(['SibSp'],axis=1,inplace=True)
+#    df.drop(['SibSp'],axis=1,inplace=True)
     return df

@@ -21,7 +21,7 @@ def create_knn_regressor_age(X,Y,parameters):
     V = np.cov(np.transpose(X))
     knn = KNeighborsRegressor(metric='mahalanobis', metric_params={'V':V})
 #    knn = KNeighborsRegressor(metric='minkowski')
-    sss = ShuffleSplit(n_splits=40, test_size = 0.2, random_state=472)
+    sss = ShuffleSplit(n_splits=20, test_size = 0.2, random_state=472)
 
     grid_search_CV = GridSearchCV(knn, parameters, cv=sss)
     grid_search_CV.fit(X, Y)
@@ -33,12 +33,19 @@ def create_knn_regressor_age(X,Y,parameters):
     print knn_score
     return knn
 
-def fill_in_missing_age_values(train_df, test_df, clf, scaled=False, scaler=None):
-    test_df["PredictedAge"] = clf.predict(test_df.drop(["Age","PassengerId"],axis = 1))
+def fill_in_missing_age_values(train_df, test_df, clf, scaler):
+
+    parsed_test_data = test_df.drop(["Age","PassengerId"],axis = 1)
+    scaled_test_df = pd.DataFrame(scaler.transform(parsed_test_data), columns=parsed_test_data.columns)
+    scaled_test_df['PredictedAge'] = clf.predict(scaled_test_df)
+    test_df['PredictedAge'] = scaled_test_df['PredictedAge']
     test_df.loc[(np.isnan(test_df["Age"]) == True),"Age"] = test_df.loc[(np.isnan(test_df["Age"]) == True),"PredictedAge"]
     test_df.drop(['PredictedAge'],axis=1,inplace=True)
 
-    train_df["PredictedAge"] = clf.predict(train_df.drop(["Age","Survived"],axis = 1))
+    parsed_train_data = train_df.drop(["Age","Survived"],axis = 1)
+    scaled_train_df = pd.DataFrame(scaler.transform(parsed_train_data), columns=parsed_train_data.columns)
+    scaled_train_df['PredictedAge'] = clf.predict(scaled_train_df)
+    train_df['PredictedAge'] = scaled_train_df['PredictedAge']
     train_df.loc[(np.isnan(train_df["Age"]) == True),"Age"] = train_df.loc[(np.isnan(train_df["Age"]) == True),"PredictedAge"]
     train_df.drop(['PredictedAge'],axis=1,inplace=True)
     
@@ -113,7 +120,7 @@ def create_linear_age_regressor(X,Y,parameters):
 
     print linear_regressor.coef_
 
-    linear_regressor_score_test = linear_regressor.score(X_train_regression, Y_train_regression)
+    linear_regressor_score_test = linear_regressor.score(X, Y)
 
     print "age r^2 on test data = %s" % (linear_regressor_score_test)
 

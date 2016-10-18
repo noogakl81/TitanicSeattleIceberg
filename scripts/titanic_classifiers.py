@@ -110,8 +110,6 @@ def create_knn_classifier(X,Y,parameters):
 
     from numpy.random import RandomState
    
-    parameters = {'n_neighbors':[5,7,9,11,13],'weights':['uniform']}
- 
     V = np.cov(np.transpose(X))
 
     knn = KNeighborsClassifier(metric='mahalanobis', metric_params={'V':V})
@@ -128,3 +126,20 @@ def create_knn_classifier(X,Y,parameters):
     print(knn_score)
     return knn
 
+def create_logistic_regression_classifier(X,Y,parameters):
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import make_scorer, accuracy_score
+
+    accuracy_scorer = make_scorer(accuracy_score)
+
+    log_reg_clf = LogisticRegression()
+    sss = StratifiedShuffleSplit(n_splits=20, test_size = 0.5, random_state=4782)
+    grid_search_CV = GridSearchCV(log_reg_clf, parameters, cv=sss, scoring=accuracy_scorer)
+    grid_search_CV.fit(X, Y)
+    print("best score equals %f" % (grid_search_CV.best_score_))
+    print("%s" % (grid_search_CV.best_params_))
+    log_reg_clf = grid_search_CV.best_estimator_
+
+    log_reg_score = log_reg_clf.score(X, Y)    
+    print(log_reg_score)
+    return log_reg_clf
